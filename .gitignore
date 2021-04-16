@@ -1,2 +1,4 @@
 venv
 resources/config.json
+resources/*.session
+resources/*.session-journal

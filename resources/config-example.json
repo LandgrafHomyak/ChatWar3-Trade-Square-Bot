@@ -4,5 +4,6 @@
   "userbot-phone": "+88005553535",
   "bot-token": "123456789:AbCdEf_01234-56789",
   "channel-id": 1000,
-  "group-id": 1001
+  "group-id": 1001,
+  "userbot-session-name": "example-name"
 }

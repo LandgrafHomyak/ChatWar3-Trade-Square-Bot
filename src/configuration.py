@@ -6,7 +6,8 @@ CONFIG_TYPING = {
     "userbot-phone": str,
     "bot-token": str,
     "channel-id": int,
-    "group-id": int
+    "group-id": int,
+    "userbot-session-name": str
 }
 
 
@@ -28,7 +29,7 @@ class ConfigurationArgumentsTypeError(Exception):
 
 
 class Configuration:
-    def __new__(cls, *, api_id, api_hash, userbot_phone, bot_token, channel_id, group_id):
+    def __new__(cls, *, api_id, api_hash, userbot_phone, bot_token, channel_id, group_id, userbot_session_name):
         if type(api_id) is not CONFIG_TYPING["api-id"]:
             raise TypeError(
                 f"'api_id' must be a {repr(CONFIG_TYPING['api-id'].__name__)}, not {repr(type(api_id).__name__)}"
@@ -59,6 +60,11 @@ class Configuration:
                 f"'group_id' must be a {repr(CONFIG_TYPING['group-id'].__name__)}, not {repr(type(group_id).__name__)}"
             )
 
+        if type(userbot_session_name) is not CONFIG_TYPING["userbot-session-name"]:
+            raise TypeError(
+                f"'userbot_session_name' must be a {repr(CONFIG_TYPING['userbot-session-name'].__name__)}, not {repr(type(userbot_session_name).__name__)}"
+            )
+
         self = super().__new__(cls)
 
         self.__api_id = api_id
@@ -67,11 +73,12 @@ class Configuration:
         self.__bot_token = bot_token
         self.__channel_id = channel_id
         self.__group_id = group_id
+        self.__userbot_session_name = userbot_session_name
 
         return self
 
     @classmethod
-    def from_dict(cls: 'Configuration', dct):
+    def from_dict(cls, dct):
         if not isinstance(dct, dict):
             raise TypeError("'dct' must be a dict")
 
@@ -94,7 +101,8 @@ class Configuration:
             userbot_phone=dct["userbot-phone"],
             bot_token=dct["bot-token"],
             channel_id=dct["channel-id"],
-            group_id=dct["group-id"]
+            group_id=dct["group-id"],
+            userbot_session_name=dct["userbot-session-name"]
         )
 
     @classmethod
@@ -127,3 +135,7 @@ class Configuration:
     @property
     def group_id(self):
         return self.__group_id
+
+    @property
+    def userbot_session_name(self):
+        return self.__userbot_session_name

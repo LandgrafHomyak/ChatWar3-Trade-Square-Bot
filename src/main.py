@@ -1,7 +1,8 @@
 import json
 import sys
 
-from config import Configuration, UnexpectedConfigurationArgumentsError, RequiredConfigurationArgumentsError, \
+from app import CW3TradeSquareBotApp
+from configuration import Configuration, UnexpectedConfigurationArgumentsError, RequiredConfigurationArgumentsError, \
     ConfigurationArgumentsTypeError
 
 
@@ -36,6 +37,9 @@ def main(argv):
         )
         return -2
     del config_path, config_f
+
+    app = CW3TradeSquareBotApp(config)
+    return app.exec()
 
 
 if __name__ == '__main__':
