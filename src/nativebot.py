@@ -1,10 +1,10 @@
 import asyncio
 
 from telethon import TelegramClient
-from telethon.events import NewMessage
+from telethon.events import NewMessage, MessageEdited
 from telethon.sessions import MemorySession
 from telethon.tl.functions.messages import ExportChatInviteRequest
-from telethon.tl.types import User, ChannelParticipantsAdmins
+from telethon.tl.types import User, ChannelParticipantsAdmins, ChannelAdminLogEventsFilter
 
 from configuration import Configuration
 
@@ -54,6 +54,20 @@ class NativeBot:
             func=lambda event: isinstance(event.chat, User)
         ))(
             self.__on_access_channel
+        )
+
+        self.__client.on(NewMessage(
+            self.__configuration.channel_id,
+            incoming=True
+        ))(
+            self.__on_new_offer
+        )
+
+        self.__client.on(MessageEdited(
+            self.__configuration.channel_id,
+            incoming=True
+        ))(
+            self.__on_edit_offer
         )
 
     @property
@@ -111,12 +125,13 @@ class NativeBot:
 
     async def __on_access_channel(self, event):
         in_c = event.chat in await self.__client.get_participants(self.__configuration.channel_id)
-        in_ca = event.chat in await self.__client.get_participants(self.__configuration.channel_id, filter=ChannelParticipantsAdmins)
+        in_ca = event.chat in await self.__client.get_participants(self.__configuration.channel_id,
+                                                                   filter=ChannelParticipantsAdmins)
         if not in_c:
             await self.__client.send_message(
                 event.chat.id,
                 f"Мне некому выдать твои права на канале, придется тебе на него подписатся по <a href='{(await self.__client(ExportChatInviteRequest(self.__configuration.channel_id))).link}'>сcылке</a>"
-            ) # todo cache requests
+            )  # todo cache requests
         elif in_ca:
             await self.__client.send_message(
                 event.chat.id,
@@ -143,3 +158,25 @@ class NativeBot:
                 event.chat.id,
                 f"Ты получил свои права. Да начнутся великие торги!"
             )
+
+    async def __on_new_offer(self, event):
+        if event.message.media is not None:
+            await event.delete()
+
+        if not event.message.raw_text.startswith("#wtb") and not event.message.raw_text.startswith("#wts"):
+            await event.delete()
+
+    async def __on_edit_offer(self, event):
+        if event.message.raw_text.startswith("#wtb") or event.message.raw_text.startswith("#wts"):
+            return
+
+        async for ee in self.userbot.iter_admin_log(self.__configuration.channel_id, limit=4):
+            if ee.new.id == event.message.id and ee.new.raw_text == event.message.raw_text:
+                old = ee.old
+                break
+        else:
+            await self.userbot.send_message(self.__configuration.channel_id, "\u26a0\ufe0fCan't get admin log record about editing this message", comment_to=event.message.id)
+
+        await self.__client.edit_message(self.__configuration.channel_id, event.message.id, old.text)
+        await self.userbot.send_message(self.__configuration.channel_id, "\u26a0\ufe0fПредложение должно начинатся с тегов <code>#wtb</code> или <code>#wts</code>, изменения отменены", comment_to=event.message.id)
+

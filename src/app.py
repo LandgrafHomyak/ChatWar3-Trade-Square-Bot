@@ -14,11 +14,12 @@ class CW3TradeSquareBotApp:
 
         self.__configuration = configuration
 
-        self.__loop = asyncio.get_event_loop()
+        self.__loop = asyncio.get_event_loop()  # todo on new event loop doesn't works userbot configuration
 
         self.__userbot = UserBot(configuration, self.__loop)
         self.__nativebot = NativeBot(configuration, self.__loop)
         self.__userbot.nativebot = self.__nativebot.client
+        self.__nativebot.userbot = self.__userbot.client
 
         self.__both_connected_locker = asyncio.locks.Lock(loop=self.__loop)
 

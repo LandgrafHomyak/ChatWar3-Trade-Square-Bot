@@ -32,7 +32,7 @@ class UserBot:
 
     async def __init(self, configuration, loop):
         await self.__client.get_dialogs()
-        # await self.__client.get_entity(89616296)
+        # await self.__client.get_entity(89616296) # свея
         self.__client.on(
             ChatAction(
                 configuration.group_id,
@@ -61,7 +61,7 @@ class UserBot:
 
 <b>Здесь нет каких то жестоких правил, но есть несколько рекомендаций и советов:</b>
 \u2734\ufe0f Чтобы предложить что либо на продажу или купить, нужно зайти на <a href='{(await self.__client(ExportChatInviteRequest(self.__configuration.channel_id))).link}'>канал</a>, а потом написать в лс <a href='tg://user?id={(await self.nativebot.get_me()).id}'>боту</a> <code>/access_channel</code> чтобы получить права на публикацию
-\u2734\ufe0f На канале можно постить сообщения только с тегами <code>#wtb</code> или <code>#wts</code>
+\u2734\ufe0f На канале можно постить сообщения только с тегами <code>#wtb</code> или <code>#wts</code> в начале, все остальные будут удаляться
 \u2734\ufe0f Правило хорошего тона - отвечать на предложения реплаем или в комментариях, чтобы было удобно отслеживать торг
 \u2734\ufe0f Продолжение следует... 
 """)  # todo cache requests
